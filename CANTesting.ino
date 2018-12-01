@@ -55,47 +55,49 @@ void loop(void)
 {
   // service software timers based on Metro tick
   if ( sysTimer.check() ) {
-    if ( txTimer ) {
+    /*if ( txTimer ) {
       --txTimer;
-    }
-    /*if ( rxTimer ) {
-      --rxTimer;
     }*/
+    if ( rxTimer ) {
+      --rxTimer;
+    }
   }
-
+  
   // if not time-delayed, read CAN messages and print 1st byte
-  /*if ( !rxTimer ) {
+  if ( !rxTimer ) {
+    Serial.println(rxCount);
     while ( CANbus.read(rxmsg) ) {
-      //hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
+      hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
       Serial.write(rxmsg.buf[0]);
       rxCount++;
     }
-  }*/
+    rxTimer = 3;
+  }
 
   // insert a time delay between transmissions
-  if ( !txTimer ) {
-    // if frames were received, print the count
-    /*if ( rxCount ) {
-      Serial.write('=');
-      Serial.print(rxCount);
-      rxCount = 0;
-    }*/
-    txTimer = 100;//milliseconds
-    msg.len = 8;
-    msg.id = 0x000;
-    for( int idx=0; idx<8; ++idx ) {
-      msg.buf[idx] = 0x0f;
-    }
-    // send 6 at a time to force tx buffering
-    txCount = 6;
-    digitalWrite(led, 1);
-    Serial.println(".");
-    while ( txCount-- ) {
-      CANbus.write(msg);
-    }
-    digitalWrite(led, 0);
-    // time delay to force some rx data queue use
-    //rxTimer = 3;//milliseconds
-  }
+//  if ( !txTimer ) {
+//    // if frames were received, print the count
+//    if ( rxCount ) {
+//      Serial.write('=');
+//      Serial.print(rxCount);
+//      rxCount = 0;
+//    }
+//    txTimer = 100;//milliseconds
+//    /*msg.len = 8;
+//    msg.id = 0x000;
+//    for( int idx=0; idx<8; ++idx ) {
+//      msg.buf[idx] = 0x0f;
+//    }*/
+//    // send 6 at a time to force tx buffering
+//    //txCount = 6;
+//    digitalWrite(led, 1);
+//    Serial.println(".");
+//    /*while ( txCount-- ) {
+//      CANbus.write(msg);
+//    }*/
+//    digitalWrite(led, 0);
+//    // time delay to force some rx data queue use
+//    rxTimer = 3;//milliseconds
+//  }
 
 }
