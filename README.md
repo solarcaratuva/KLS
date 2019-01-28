@@ -1,2 +1,2 @@
-# CANTesting
-Testing CAN communication with Teensy 3.6
+# CAN
+CAN communications between Teensy, BPS, Motor Controller
