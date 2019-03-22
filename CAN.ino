@@ -10,13 +10,17 @@
 #define BUFFER_SIZE 10
 
 static CAN_message_t msg_rx, msg_tx;  // memory allocated for CAN packets
+static CAN_stats_t stat;
 static void print_CAN_msg(CAN_message_t &msg);
 void parse_serial();
 
 void setup() {
     Can1.begin();
-    msg_tx.id = 0x101;  // ID field
+    Can1.startStats();
+    msg_tx.id = 256;  // ID field
     msg_tx.flags.extended = 1;     // extended identifier
+    msg_tx.flags.remote = 0;
+    msg_tx.flags.overrun = 0;
     msg_tx.len = 8;     // number of bytes to expect in data field
     // data field (strnpcy used to prevent copy of null terminator)
     strncpy((char *)msg_tx.buf, "hello", 8); 
@@ -25,6 +29,11 @@ void setup() {
 }
 
 void loop() {    
+    stat = Can1.getStats();
+    Serial.print("RX Mailbox Entries: ");
+    Serial.println(stat.ringRxMax);
+    Serial.print("RX Frames Lost: ");
+    Serial.println(stat.ringRxFramesLost);
     if (Can1.available()) {
         int st = Can1.read(msg_rx);  // write data into msg
         Serial.println(st);
