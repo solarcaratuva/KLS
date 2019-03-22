@@ -6,14 +6,16 @@
 #include <cstdlib>
 #include <string>
 
+#define TOKEN_SIZE 64
+#define BUFFER_SIZE 10
+
 static CAN_message_t msg_rx, msg_tx;  // memory allocated for CAN packets
 static void print_CAN_msg(CAN_message_t &msg);
 void parse_serial();
 
 void setup() {
     Can1.begin();
-    msg_rx.flags.extended = 1; 
-    msg_tx.id = 0x100;  // ID field
+    msg_tx.id = 0x101;  // ID field
     msg_tx.flags.extended = 1;     // extended identifier
     msg_tx.len = 8;     // number of bytes to expect in data field
     // data field (strnpcy used to prevent copy of null terminator)
@@ -22,12 +24,14 @@ void setup() {
     Serial.println(F("CAN Blaster 9000!"));
 }
 
-void loop() {
+void loop() {    
     if (Can1.available()) {
-        Can1.read(msg_rx);  // write data into msg
+        int st = Can1.read(msg_rx);  // write data into msg
+        Serial.println(st);
         print_CAN_msg(msg_rx);
     }
     parse_serial();  // not blocking. (!important)
+    
     delay(1);
 }
 
@@ -35,8 +39,8 @@ static void print_CAN_msg(CAN_message_t &msg) {
     // static prefix makes variable persistent with each call of this function.
     static bool print_header = true;  
     if (print_header) {
-        Serial.println(F("id,\timestamp,\tlen,\text,\t[buf]"));
-        print_header = false;
+        Serial.println(F("id,\tstamp,\tlen,\text,\t[buf]"));
+        print_header = true;
     }
     Serial.print(msg.id, HEX);
     Serial.write(',');
@@ -67,13 +71,14 @@ static void print_CAN_msg(CAN_message_t &msg) {
 void parse_serial() {
     if (Serial.available()) {
         char c = Serial.read();
-        static char tokens[10][16] = {"", "", "", "", "", "", "", "", "", ""};
+        
+        static char tokens[BUFFER_SIZE][TOKEN_SIZE] = {"", "", "", "", "", "", "", "", "", ""};
         static uint8_t tokenIndex = 0;
         static uint8_t i = 0;  // represents index of character in a given token (defined by tokenIndex)
         uint8_t parse_i = 0;  // once the '\n' character is received, the tokens are decoded and
                               // branching logic is used to read/write system variables.
         // buffer overflow prevention
-        if ((i < sizeof(tokens[0])) && (tokenIndex < sizeof(tokens) / sizeof(tokens[0]))) {
+        if (i < BUFFER_SIZE && tokenIndex < TOKEN_SIZE) {
             switch (c) {
                 case ' ':
                     tokens[tokenIndex][i++] = 0;  // make sure to add the null terminator
@@ -113,7 +118,7 @@ void parse_serial() {
                             if (tokenIndex < parse_i) {
                                 Serial.println("error: missing argument");
                             } else {
-                                msg_tx.ext = atoi(tokens[parse_i]);
+                                msg_tx.flags.extended = atoi(tokens[parse_i]);
                             }
                         } else if (strcmp(tokens[parse_i], "len") == 0) {
                             parse_i++;
@@ -140,7 +145,7 @@ void parse_serial() {
                         } else if (strcmp(tokens[parse_i], "id") == 0) {
                             Serial.println(msg_tx.id);
                         } else if (strcmp(tokens[parse_i], "ext") == 0) {
-                            Serial.println(msg_tx.ext);
+                            Serial.println(msg_tx.flags.extended);
                         } else if (strcmp(tokens[parse_i], "len") == 0) {
                             Serial.println(msg_tx.len);
                         } else if (strcmp(tokens[parse_i], "buf") == 0) {
