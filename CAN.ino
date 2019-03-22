@@ -1,9 +1,10 @@
 // CAN Blaster 9000 will transmit packets over the can bus periodically
 
 //#include <WProgram.h>
-#include <ArduinoJson.h>  // uses v5 API, version 5.13.4
-#include <FlexCAN.h>      // This one is the one that was built-in to arduino
-#include <Metro.h>        // This is basically the Timer library I pasted in #ElectricalTeam
+//#include <ArduinoJson.h>  // uses v5 API, version 5.13.4
+#include <FlexCAN.h>  // This one is the one that was built-in to arduino
+#include <Metro.h>    // This is basically the Timer library I pasted in #ElectricalTeam
+#include <kinetis_flexcan.h>
 #include <cstdlib>
 #include <string>
 
@@ -13,9 +14,10 @@ void parse_serial();
 
 void setup() {
     Can1.begin();
-    msg_tx.id = 0x100;  // ID field
-    msg_tx.ext = 0;     // extended identifier
-    msg_tx.len = 8;     // number of bytes to expect in data field
+    msg_rx.flags.extended = 1;
+    msg_tx.id = 0x100;          // ID field
+    msg_tx.flags.extended = 1;  // extended identifier
+    msg_tx.len = 8;             // number of bytes to expect in data field
     strncpy((char *)msg_tx.buf, "hello",
             8);  // data field (strnpcy used to prevent copy of null terminator)
     while (!Serial) continue;
@@ -35,19 +37,19 @@ static void print_CAN_msg(CAN_message_t &msg) {
     static bool print_header =
         true;  // static prefix makes variable persistent with each call of this function.
     if (print_header) {
-        Serial.println(F("id,\text,\tlen,\ttimeout,\t[buf]"));
+        Serial.println(F("id,\timestamp,\tlen,\text,\t[buf]"));
         print_header = false;
     }
     Serial.print(msg.id, HEX);
     Serial.write(',');
     Serial.write('\t');
-    Serial.print(msg.ext, HEX);
+    Serial.print(msg.timestamp);
     Serial.write(',');
     Serial.write('\t');
     Serial.print(msg.len);
     Serial.write(',');
     Serial.write('\t');
-    Serial.print(msg.timeout);
+    Serial.print(msg.flags.extended);
     Serial.write(',');
     Serial.write('\t');
     Serial.write('"');
@@ -68,8 +70,8 @@ void parse_serial() {
     if (Serial.available()) {
         char c = Serial.read();
         static char tokens[10][16] = {"", "", "", "", "", "", "", "", "", ""};
-        static int tokenIndex = 0;
-        static char i =
+        static uint8_t tokenIndex = 0;
+        static uint8_t i =
             0;  // represents index of character in a given token (defined by tokenIndex)
         uint8_t parse_i = 0;  // once the '\n' character is received, the tokens are decoded and
                               // branching logic is used to read/write system variables.
