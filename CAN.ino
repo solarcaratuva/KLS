@@ -1,8 +1,8 @@
 // Uses collin80 library found at
 // https://github.com/collin80/FlexCAN_Library
-#include <kinetis_flexcan.h>
 #include <FlexCAN.h>
 #include <Metro.h>
+#include <kinetis_flexcan.h>
 #include <cstdlib>
 #include <string>
 
@@ -10,24 +10,24 @@
 #define BUFFER_SIZE 10
 FlexCAN Can1(250000, 1);
 static CAN_message_t msg_rx, msg_tx;  // memory allocated for CAN packets
-//static CAN_stats_t stat;
+// static CAN_stats_t stat;
 static void print_CAN_msg(CAN_message_t &msg);
 void parse_serial();
 
 void setup() {
     Can1.begin();
-    //Can1.startStats();
+    // Can1.startStats();
     msg_tx.id = 256;  // ID field
-    msg_tx.ext = 1;     // extended identifier
+    msg_tx.ext = 1;   // extended identifier
     msg_tx.timeout = 500;
-    msg_tx.len = 8;     // number of bytes to expect in data field
+    msg_tx.len = 8;  // number of bytes to expect in data field
     // data field (strnpcy used to prevent copy of null terminator)
-    strncpy((char *)msg_tx.buf, "hello", 8); 
+    strncpy((char *)msg_tx.buf, "hello", 8);
     while (!Serial) continue;
     Serial.println(F("CAN Blaster 9000!"));
 }
 
-void loop() {    
+void loop() {
     /*stat = Can1.getStats();
     Serial.print("RX Mailbox Entries: ");
     Serial.println(stat.ringRxMax);
@@ -43,16 +43,16 @@ void loop() {
         Serial.println(st);
         print_CAN_msg(msg_rx);
     }
-    //parse_serial();  // not blocking. (!important)
-    //int st = Can1.write(msg_tx);
-    //print_CAN_msg(msg_tx);
-    //Serial.println(st);
+    // parse_serial();  // not blocking. (!important)
+    // int st = Can1.write(msg_tx);
+    // print_CAN_msg(msg_tx);
+    // Serial.println(st);
     delay(100);
 }
 
 static void print_CAN_msg(CAN_message_t &msg) {
     // static prefix makes variable persistent with each call of this function.
-    static bool print_header = true;  
+    static bool print_header = true;
     if (print_header) {
         Serial.println(F("id,\tlen,\text,\t[buf]"));
         print_header = true;
@@ -67,23 +67,21 @@ static void print_CAN_msg(CAN_message_t &msg) {
     Serial.write(',');
     Serial.write('\t');
     Serial.write('"');
-    //Serial.print(&msg.buf);
     for (int i = 0; i < msg.len; i++) {
-        //Serial.print(msg.buf[i], HEX);
         int temp = msg.buf[i];
         char buf[4];
         for (int j = 0; j < 8; j++) {
-          if (temp & 0x01) {
-            buf[j % 4] = '1';
-          } else {
-            buf[j % 4] = '0';
-          }
-          if ((j + 1) % 4 == 0) {
-            for (int k = 3; k > 0; k--) {
-              Serial.print(buf[k]);
+            if (temp & 0x01) {
+                buf[j % 4] = '1';
+            } else {
+                buf[j % 4] = '0';
             }
-          }
-          temp >>= 1;
+            if ((j + 1) % 4 == 0) {
+                for (int k = 3; k > 0; k--) {
+                    Serial.print(buf[k]);
+                }
+            }
+            temp >>= 1;
         }
     }
     Serial.println('"');
@@ -99,10 +97,11 @@ static void print_CAN_msg(CAN_message_t &msg) {
 void parse_serial() {
     if (Serial.available()) {
         char c = Serial.read();
-        
+
         static char tokens[BUFFER_SIZE][TOKEN_SIZE] = {"", "", "", "", "", "", "", "", "", ""};
         static uint8_t tokenIndex = 0;
-        static uint8_t i = 0;  // represents index of character in a given token (defined by tokenIndex)
+        static uint8_t i =
+            0;  // represents index of character in a given token (defined by tokenIndex)
         uint8_t parse_i = 0;  // once the '\n' character is received, the tokens are decoded and
                               // branching logic is used to read/write system variables.
         // buffer overflow prevention
