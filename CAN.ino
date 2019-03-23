@@ -44,23 +44,20 @@ void loop() {
         print_CAN_msg(msg_rx);
     }
     //parse_serial();  // not blocking. (!important)
-    int st = Can1.write(msg_tx);
+    //int st = Can1.write(msg_tx);
     //print_CAN_msg(msg_tx);
     //Serial.println(st);
-    delay(750);
+    delay(100);
 }
 
 static void print_CAN_msg(CAN_message_t &msg) {
     // static prefix makes variable persistent with each call of this function.
     static bool print_header = true;  
     if (print_header) {
-        Serial.println(F("id,\tstamp,\tlen,\text,\t[buf]"));
+        Serial.println(F("id,\tlen,\text,\t[buf]"));
         print_header = true;
     }
     Serial.print(msg.id, HEX);
-    Serial.write(',');
-    Serial.write('\t');
-    Serial.print(' ');
     Serial.write(',');
     Serial.write('\t');
     Serial.print(msg.len);
@@ -70,8 +67,24 @@ static void print_CAN_msg(CAN_message_t &msg) {
     Serial.write(',');
     Serial.write('\t');
     Serial.write('"');
+    //Serial.print(&msg.buf);
     for (int i = 0; i < msg.len; i++) {
-        Serial.write(msg.buf[i]);
+        //Serial.print(msg.buf[i], HEX);
+        int temp = msg.buf[i];
+        char buf[4];
+        for (int j = 0; j < 8; j++) {
+          if (temp & 0x01) {
+            buf[j % 4] = '1';
+          } else {
+            buf[j % 4] = '0';
+          }
+          if ((j + 1) % 4 == 0) {
+            for (int k = 3; k > 0; k--) {
+              Serial.print(buf[k]);
+            }
+          }
+          temp >>= 1;
+        }
     }
     Serial.println('"');
 }
