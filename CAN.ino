@@ -18,7 +18,7 @@ void setup() {
     Can1.begin();
     Can1.startStats();
     msg_tx.id = 256;  // ID field
-    msg_tx.flags.extended = 1;     // extended identifier
+    msg_tx.flags.extended = 0;     // extended identifier
     msg_tx.flags.remote = 0;
     msg_tx.flags.overrun = 0;
     msg_tx.len = 8;     // number of bytes to expect in data field
@@ -29,7 +29,7 @@ void setup() {
 }
 
 void loop() {    
-    stat = Can1.getStats();
+    /*stat = Can1.getStats();
     Serial.print("RX Mailbox Entries: ");
     Serial.println(stat.ringRxMax);
     Serial.print("RX Frames Lost: ");
@@ -38,9 +38,16 @@ void loop() {
         int st = Can1.read(msg_rx);  // write data into msg
         Serial.println(st);
         print_CAN_msg(msg_rx);
+    }*/
+    if (Can1.available()) {
+        int st = Can1.read(msg_rx);  // write data into msg
+        Serial.println(st);
+        print_CAN_msg(msg_rx);
     }
-    parse_serial();  // not blocking. (!important)
-    
+    //parse_serial();  // not blocking. (!important)
+    //int st = Can1.write(msg_tx);
+    //print_CAN_msg(msg_tx);
+    //Serial.println(st);
     delay(1);
 }
 
