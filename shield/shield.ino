@@ -47,9 +47,9 @@ void loop() {
         Serial.println();
     }
 
-    CAN.sendMsgBuf(0x70, 0, 8, stmp);
+    //CAN.sendMsgBuf(0x70, 1, 8, stmp);
 
-    delay(1000);  // send data once per second
+    delay(200);  // send data once per second
 }
 
 /*********************************************************************************************************

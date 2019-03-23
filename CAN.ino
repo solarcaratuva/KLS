@@ -8,19 +8,18 @@
 
 #define TOKEN_SIZE 64
 #define BUFFER_SIZE 10
-
+FlexCAN Can1(250000, 1);
 static CAN_message_t msg_rx, msg_tx;  // memory allocated for CAN packets
-static CAN_stats_t stat;
+//static CAN_stats_t stat;
 static void print_CAN_msg(CAN_message_t &msg);
 void parse_serial();
 
 void setup() {
     Can1.begin();
-    Can1.startStats();
+    //Can1.startStats();
     msg_tx.id = 256;  // ID field
-    msg_tx.flags.extended = 0;     // extended identifier
-    msg_tx.flags.remote = 0;
-    msg_tx.flags.overrun = 0;
+    msg_tx.ext = 1;     // extended identifier
+    msg_tx.timeout = 500;
     msg_tx.len = 8;     // number of bytes to expect in data field
     // data field (strnpcy used to prevent copy of null terminator)
     strncpy((char *)msg_tx.buf, "hello", 8); 
@@ -45,10 +44,10 @@ void loop() {
         print_CAN_msg(msg_rx);
     }
     //parse_serial();  // not blocking. (!important)
-    //int st = Can1.write(msg_tx);
+    int st = Can1.write(msg_tx);
     //print_CAN_msg(msg_tx);
     //Serial.println(st);
-    delay(1);
+    delay(750);
 }
 
 static void print_CAN_msg(CAN_message_t &msg) {
@@ -61,13 +60,13 @@ static void print_CAN_msg(CAN_message_t &msg) {
     Serial.print(msg.id, HEX);
     Serial.write(',');
     Serial.write('\t');
-    Serial.print(msg.timestamp);
+    Serial.print(' ');
     Serial.write(',');
     Serial.write('\t');
     Serial.print(msg.len);
     Serial.write(',');
     Serial.write('\t');
-    Serial.print(msg.flags.extended);
+    Serial.print(msg.ext);
     Serial.write(',');
     Serial.write('\t');
     Serial.write('"');
@@ -134,7 +133,7 @@ void parse_serial() {
                             if (tokenIndex < parse_i) {
                                 Serial.println("error: missing argument");
                             } else {
-                                msg_tx.flags.extended = atoi(tokens[parse_i]);
+                                msg_tx.ext = atoi(tokens[parse_i]);
                             }
                         } else if (strcmp(tokens[parse_i], "len") == 0) {
                             parse_i++;
@@ -161,7 +160,7 @@ void parse_serial() {
                         } else if (strcmp(tokens[parse_i], "id") == 0) {
                             Serial.println(msg_tx.id);
                         } else if (strcmp(tokens[parse_i], "ext") == 0) {
-                            Serial.println(msg_tx.flags.extended);
+                            Serial.println(msg_tx.ext);
                         } else if (strcmp(tokens[parse_i], "len") == 0) {
                             Serial.println(msg_tx.len);
                         } else if (strcmp(tokens[parse_i], "buf") == 0) {
