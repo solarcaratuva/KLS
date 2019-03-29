@@ -74,7 +74,7 @@ void print_msg_decode(CAN_message_t &msg) {
 
         unsigned int curr_lsb = msg.buf[2];
         unsigned int curr_msb = msg.buf[3] << 8;
-        unsigned int curr = (curr_msb + curr_lsb) / 10;
+        unsigned int curr = (curr_msb + curr_lsb);
         Serial.print("Current: ");
         Serial.print(curr, DEC);
         Serial.println(" A");
@@ -85,8 +85,25 @@ void print_msg_decode(CAN_message_t &msg) {
         Serial.print("Voltage: ");
         Serial.print(volt, DEC);
         Serial.println(" V");
-    }
 
+        unsigned int err_lsb = msg.buf[6];
+        for (int i = 0; i < 8; i++) {
+            if (err_lsb & 0x01) {
+                Serial.print("Error code ");
+                Serial.println(i, DEC);
+            }
+            err_lsb >>= 1;
+        }
+        unsigned int err_msb = msg.buf[7];
+        for (int i = 0; i < 8; i++) {
+            if (err_msb & 0x01) {
+                Serial.print("Error code ");
+                Serial.println(i + 8, DEC);
+            }
+            err_msb >>= 1;
+        }
+    }
+    // message 2
     if (msg.id == 0x0CF11F05) {
     }
 }

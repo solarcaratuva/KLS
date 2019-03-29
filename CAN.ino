@@ -19,10 +19,10 @@ void setup() {
 void loop() {
     if (Can1.available()) {
         int st = Can1.read(msg_rx);  // write data into msg
-        Serial.println(st);
+        // Serial.println(st);
         // static prefix makes variable persistent with each call of this function.
         // static bool print_header = true;
         print_msg_decode(msg_rx);
     }
-    delay(100);
+    delay(10);
 }
