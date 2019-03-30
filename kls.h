@@ -199,16 +199,12 @@ class KLS {
 
         Serial.print("Brake: ");
         Serial.println(status.switches.brake);
-
         Serial.print("Backward: ");
         Serial.println(status.switches.backward);
-
         Serial.print("Forward: ");
         Serial.println(status.switches.forward);
-
         Serial.print("Foot: ");
         Serial.println(status.switches.foot);
-
         Serial.print("Boost: ");
         Serial.println(status.switches.boost);
 
