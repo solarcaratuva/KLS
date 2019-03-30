@@ -69,8 +69,11 @@ class KLS {
         // message 1
         if (msg.id == 0x0CF11E05) {
             parsed = 1;
+            // rpm values range from 0-6000RPM
             status.rpm = (msg.buf[1] << 8) + msg.buf[0];
+            // current values range from 0-400A
             status.current = (msg.buf[3] << 8) + msg.buf[2];
+            // voltage values range from 0-180V
             status.voltage = ((msg.buf[5] << 8) + msg.buf[4]) / 10.0;
             status.errors = parse_errors(msg.buf[6], msg.buf[7]);
         }
@@ -78,17 +81,20 @@ class KLS {
         if (msg.id == 0x0CF11F05) {
             parsed = 2;
             // throttle will only go from 0.8-4.2V
+            // throttle values map from 0-255 to 0-5V
             status.throttle = (msg.buf[0] * 5) / 256.0;
+            // temperature offset of 40C
             status.controller_temp = msg.buf[1] - 40;
+            // temperature offset of 30C
             status.motor_temp = msg.buf[2] - 30;
-            uint8_t controller_status = msg.buf[4];
 
+            uint8_t controller_status = msg.buf[4];
             // two least significant bits
             status.command_status = controller_status & 0x03;
             status.feedback_status = (controller_status & 0x0C) >> 2;
 
             uint8_t switch_status = msg.buf[5];
-
+            // mask each bit to extract each switch status
             status.switches.hall_a = switch_status & 0x01;
             status.switches.hall_b = switch_status & 0x02;
             status.switches.hall_c = switch_status & 0x04;
