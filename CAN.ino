@@ -2,6 +2,7 @@
 
 FlexCAN Can1(250000, 1);
 static CAN_message_t msg_rx, msg_tx;  // memory allocated for CAN packets
+KLS k;
 
 void setup() {
     Can1.begin();
@@ -19,10 +20,8 @@ void setup() {
 void loop() {
     if (Can1.available()) {
         int st = Can1.read(msg_rx);  // write data into msg
-        // Serial.println(st);
-        // static prefix makes variable persistent with each call of this function.
-        // static bool print_header = true;
-        print_msg_decode(msg_rx);
+        k.parse(msg_rx);
+        k.print();
     }
     delay(60);
 }

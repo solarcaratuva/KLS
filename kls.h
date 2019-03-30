@@ -206,37 +206,4 @@ class KLS {
     }
 };
 
-void print_msg_binary(CAN_message_t &msg, bool print_header) {
-    if (print_header) {
-        Serial.println(F("id,\tlen,\text,\t[buf]"));
-    }
-    Serial.print(msg.id, HEX);
-    Serial.write(',');
-    Serial.write('\t');
-    Serial.print(msg.len);
-    Serial.write(',');
-    Serial.write('\t');
-    Serial.print(msg.ext);
-    Serial.write(',');
-    Serial.write('\t');
-    Serial.write('"');
-    char buf[4];
-    int num_bits = 4 * msg.len;
-    int msb = 1 << (num_bits - 1);
-    for (int i = 0; i < num_bits; i++) {
-        uint8_t temp = msg.buf[i];
-        if (temp & msb) {
-            buf[i % 4] = '1';
-        } else {
-            buf[i % 4] = '0';
-        }
-        if ((i + 1) % 4 == 0) {
-            for (int j = 0; j < 3; j++) {
-                Serial.write(buf[j]);
-            }
-        }
-        temp <<= 1;
-    }
-}
-
 #endif  // __KLS_H__
