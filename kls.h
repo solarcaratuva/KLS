@@ -74,10 +74,10 @@ void print_msg_decode(CAN_message_t &msg) {
 
         unsigned int curr_lsb = msg.buf[2];
         unsigned int curr_msb = msg.buf[3] << 8;
-        float curr = (curr_msb + curr_lsb) * 1000.0;
+        float curr = (curr_msb + curr_lsb);
         Serial.print("Current: ");
         Serial.print(curr, 3);
-        Serial.println(" mA");
+        Serial.println(" A");
 
         unsigned int volt_lsb = msg.buf[4];
         unsigned int volt_msb = msg.buf[5] << 8;
@@ -106,7 +106,8 @@ void print_msg_decode(CAN_message_t &msg) {
     }
     // message 2
     if (msg.id == 0x0CF11F05) {
-        float throttle = (msg.buf[0] * 5) / 255.0;
+        // throttle will only go from 0.8-4.2V
+        float throttle = (msg.buf[0] * 5) / 256.0;
         Serial.print("Throttle: ");
         Serial.print(throttle, 3);
         Serial.println(" V");
@@ -135,18 +136,18 @@ void print_msg_decode(CAN_message_t &msg) {
         Serial.println(fdbk_status);
 
         unsigned int switch_status = msg.buf[5];
-        
+
         bool hall_a = switch_status & 0x01;
         bool hall_b = switch_status & 0x02;
         bool hall_c = switch_status & 0x04;
-        
+
         Serial.print("Hall sensors: ");
         Serial.print(hall_a);
         Serial.print(" ");
         Serial.print(hall_b);
         Serial.print(" ");
         Serial.println(hall_c);
-        
+
         bool brake = switch_status & 0x08;
         bool backward = switch_status & 0x10;
         bool forward = switch_status & 0x20;

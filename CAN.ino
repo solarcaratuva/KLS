@@ -24,5 +24,5 @@ void loop() {
         // static bool print_header = true;
         print_msg_decode(msg_rx);
     }
-    delay(10);
+    delay(60);
 }
