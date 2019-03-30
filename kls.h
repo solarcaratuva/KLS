@@ -9,6 +9,62 @@
 #include <cstdlib>
 #include <string>
 
+typedef struct KLS_switches {
+    bool hall_a;
+    bool hall_b;
+    bool hall_c;
+    bool brake;
+    bool backward;
+    bool forward;
+    bool foot;
+    bool boost;
+} KLS_switches;
+
+typedef struct KLS_status {
+    unsigned int rpm;
+    float current;
+    float voltage;
+    float throttle;
+    unsigned int cont_temp;
+    unsigned int motor_temp;
+    bool command_status;
+    bool feedback_status;
+    KLS_switches switches;
+    unsigned int errors[16] = {0};
+} KLS_status;
+
+class KLS {
+   public:
+    KLS_status status;
+    KLS(){};
+    void update(const KLS_status &new_status) {
+        status.rpm = new_status.rpm;
+        status.current = new_status.current;
+        status.voltage = new_status.voltage;
+        status.throttle = new_status.throttle;
+        status.cont_temp = new_status.cont_temp;
+        status.motor_temp = new_status.motor_temp;
+        status.command_status = new_status.command_status;
+        status.feedback_status = new_status.feedback_status;
+
+        status.switches.hall_a = new_status.switches.hall_a;
+        status.switches.hall_b = new_status.switches.hall_b;
+        status.switches.hall_c = new_status.switches.hall_c;
+        status.switches.brake = new_status.switches.brake;
+        status.switches.backward = new_status.switches.backward;
+        status.switches.forward = new_status.switches.forward;
+        status.switches.foot = new_status.switches.foot;
+        status.switches.boost = new_status.switches.boost;
+    }
+
+    void update(unsigned int rpm, float current, float voltage, float throttle) {
+        status.rpm = rpm;
+        status.current = current;
+        status.voltage = voltage;
+        status.throttle = throttle;
+    }
+};
+
 void print_msg_binary(CAN_message_t &msg, bool print_header) {
     if (print_header) {
         Serial.println(F("id,\tlen,\text,\t[buf]"));
