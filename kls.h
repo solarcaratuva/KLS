@@ -25,24 +25,97 @@ typedef struct KLS_status {
     float current;
     float voltage;
     float throttle;
-    unsigned int cont_temp;
+    unsigned int controller_temp;
     unsigned int motor_temp;
     bool command_status;
     bool feedback_status;
     KLS_switches switches;
-    unsigned int errors[16] = {0};
+    bool errors[16] = {0};
 } KLS_status;
 
 class KLS {
    public:
     KLS_status status;
-    KLS(){};
+    KLS();
+    uint8_t parse(const CAN_message_t &msg) {
+        uint8_t parsed = 0;
+        // message 1
+        if (msg.id == 0x0CF11E05) {
+            parsed = 1;
+            status.rpm = (msg.buf[1] << 8) + msg.buf[0];
+            status.current = (msg.buf[3] << 8) + msg.buf[2];
+            status.voltage = ((msg.buf[5] << 8) + msg.buf[4]) / 10.0;
+
+            uint8_t err_count = parse_errors(msg.buf[6], msg.buf[7]);
+            if (err_count != 0) {
+                Serial.print("Errors detected: ");
+                for (int i = 0; i < 16; i++) {
+                    if (status.errors[i]) {
+                        Serial.print("ERR");
+                        Serial.print(i);
+                        Serial.print(" ");
+                    }
+                }
+                Serial.println("");
+            }
+        }
+        // message 2
+        if (msg.id == 0x0CF11F05) {
+            parsed = 2;
+            // throttle will only go from 0.8-4.2V
+            status.throttle = (msg.buf[0] * 5) / 256.0;
+            status.controller_temp = msg.buf[1] - 40;
+            status.motor_temp = msg.buf[2] - 30;
+            uint8_t controller_status = msg.buf[4];
+
+            // two least significant bits
+            status.command_status = controller_status & 0x03;
+            status.feedback_status = (controller_status & 0x0C) >> 2;
+
+            uint8_t switch_status = msg.buf[5];
+
+            status.switches.hall_a = switch_status & 0x01;
+            status.switches.hall_b = switch_status & 0x02;
+            status.switches.hall_c = switch_status & 0x04;
+
+            status.switches.brake = switch_status & 0x08;
+            status.switches.backward = switch_status & 0x10;
+            status.switches.forward = switch_status & 0x20;
+            status.switches.foot = switch_status & 0x40;
+            status.switches.boost = switch_status & 0x80;
+        }
+        return parsed;
+    }
+
+    uint8_t parse_errors(uint8_t lsb, uint8_t msb) {
+        uint8_t err_count = 0;
+        for (int i = 0; i < 8; i++) {
+            if (lsb & 0x01) {
+                Serial.print("Error code ");
+                Serial.println(i, DEC);
+                status.errors[i] = 1;
+                err_count++;
+            }
+            lsb >>= 1;
+        }
+        for (int i = 0; i < 8; i++) {
+            if (msb & 0x01) {
+                Serial.print("Error code ");
+                Serial.println(i + 8, DEC);
+                status.errors[i + 8] = 1;
+                err_count++;
+            }
+            msb >>= 1;
+        }
+        return err_count;
+    }
+
     void update(const KLS_status &new_status) {
         status.rpm = new_status.rpm;
         status.current = new_status.current;
         status.voltage = new_status.voltage;
         status.throttle = new_status.throttle;
-        status.cont_temp = new_status.cont_temp;
+        status.controller_temp = new_status.controller_temp;
         status.motor_temp = new_status.motor_temp;
         status.command_status = new_status.command_status;
         status.feedback_status = new_status.feedback_status;
@@ -83,7 +156,7 @@ void print_msg_binary(CAN_message_t &msg, bool print_header) {
     int num_bits = 4 * msg.len;
     int msb = 1 << (num_bits - 1);
     for (int i = 0; i < num_bits; i++) {
-        int temp = msg.buf[i];
+        uint8_t temp = msg.buf[i];
         if (temp & msb) {
             buf[i % 4] = '1';
         } else {
@@ -168,9 +241,9 @@ void print_msg_decode(CAN_message_t &msg) {
         Serial.print(throttle, 3);
         Serial.println(" V");
 
-        unsigned int cont_temp = msg.buf[1] - 40;
+        unsigned int controller_temp = msg.buf[1] - 40;
         Serial.print("Controller Temp: ");
-        Serial.print(cont_temp);
+        Serial.print(controller_temp);
         Serial.println(" C");
 
         unsigned int motor_temp = msg.buf[2] - 30;
