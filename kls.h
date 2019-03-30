@@ -1,5 +1,9 @@
-// Uses pawelsky library found at
+// William Zhang
+// Written to interface with KLS 12201-8080I
+// motor controller over CAN
+// Uses pawelsky fork of FlexCAN library found at
 // https://github.com/pawelsky/FlexCAN_Library
+
 #ifndef __KLS_H__
 #define __KLS_H__
 
