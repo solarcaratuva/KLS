@@ -28,7 +28,7 @@ void loop() {
     unsigned char len = 0;
     unsigned char buf[8];
 
-    Serial.println("In loop");
+    // Serial.println("In loop");
     // send data:  id = 0x70, standard frame, data len = 8, stmp: data buf
     if (CAN_MSGAVAIL == CAN.checkReceive()) {
         CAN.readMsgBuf(&len, buf);  // read data,  len: data length, buf: data buf
@@ -47,7 +47,7 @@ void loop() {
         Serial.println();
     }
 
-    //CAN.sendMsgBuf(0x70, 1, 8, stmp);
+    // CAN.sendMsgBuf(0x70, 1, 8, stmp);
 
     delay(200);  // send data once per second
 }
