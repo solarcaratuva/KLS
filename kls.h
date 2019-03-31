@@ -43,10 +43,14 @@ typedef struct KLS_status {
 } KLS_status;
 
 class KLS {
+   private:
+    uint8_t id;
+
    public:
     KLS_status status;
+    KLS(uint8_t addr = 0x05) {
+        id = addr;
 
-    KLS() {
         status.rpm = 0;
         status.current = 0.0;
         status.voltage = 0.0;
@@ -71,7 +75,7 @@ class KLS {
     uint8_t parse(const CAN_message_t &msg) {
         uint8_t parsed = 0;
         // message 1
-        if (msg.id == 0x0CF11E05) {
+        if (msg.id == 0x0CF11E00 + id) {
             parsed = 1;
             // rpm values range from 0-6000RPM
             status.rpm = (msg.buf[1] << 8) + msg.buf[0];
@@ -82,7 +86,7 @@ class KLS {
             status.errors = parse_errors(msg.buf[6], msg.buf[7]);
         }
         // message 2
-        if (msg.id == 0x0CF11F05) {
+        if (msg.id == 0x0CF11F00 + id) {
             parsed = 2;
             // throttle will only go from 0.8-4.2V
             // throttle values map from 0-255 to 0-5V
