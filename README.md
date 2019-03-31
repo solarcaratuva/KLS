@@ -1,6 +1,16 @@
-# CANTesting
-Testing CAN communication with Teensy 3.6
+# CAN
+Code for interfacing over CAN with Teensy 3.6
 
+## Contents of this repository
+* **WIP**
+
+
+## KLS Motor Controller Library
+* "kls.h" contains the class definition for KLS
+* **WIP** Library documentation
+
+
+## Miscellaneous Notes
 Some things we've learned:
 - Bit stuffing: for synchronization purposes, if there are 5 bits of the same value sent consecutively, then a bit of opposite value is inserted ("stuffed") after those 5 bits
 	- See photos>bit_stuffing.PNG

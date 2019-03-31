@@ -8,7 +8,6 @@
 #define __KLS_H__
 
 #include <FlexCAN.h>
-#include <Metro.h>
 #include <kinetis_flexcan.h>
 #include <cstdlib>
 #include <string>
@@ -75,7 +74,7 @@ class KLS {
     uint8_t parse(const CAN_message_t &msg) {
         uint8_t parsed = 0;
         // message 1
-        if (msg.id == 0x0CF11E00 + id) {
+        if (msg.id == (uint32_t)0x0CF11E00 + id) {
             parsed = 1;
             // rpm values range from 0-6000RPM
             status.rpm = (msg.buf[1] << 8) + msg.buf[0];
@@ -86,7 +85,7 @@ class KLS {
             status.errors = parse_errors(msg.buf[6], msg.buf[7]);
         }
         // message 2
-        if (msg.id == 0x0CF11F00 + id) {
+        if (msg.id == (uint32_t)0x0CF11F00 + id) {
             parsed = 2;
             // throttle will only go from 0.8-4.2V
             // throttle values map from 0-255 to 0-5V

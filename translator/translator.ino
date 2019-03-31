@@ -12,9 +12,9 @@ FlexCAN Can1(250000, 1);
 static CAN_message_t msg_rx, msg_tx;  // memory allocated for CAN packets
 
 void setup() {
-    Serial.begin(115200);
     Can0.begin();
     Can1.begin();
+    Serial.begin(115200);
     Serial.println(F("Initialized CAN!"));
 }
 
