@@ -1,8 +1,10 @@
-// William Zhang
-// Written to interface with KLS 12201-8080I
-// motor controller over CAN
-// Uses pawelsky fork of FlexCAN library found at
-// https://github.com/pawelsky/FlexCAN_Library
+/*
+ * William Zhang
+ * Written to interface with KLS 12201-8080I
+ * motor controller over CAN
+ * Uses pawelsky fork of FlexCAN library found at
+ * https://github.com/pawelsky/FlexCAN_Library
+ */
 
 #ifndef __KLS_H__
 #define __KLS_H__
@@ -11,6 +13,7 @@
 #include <kinetis_flexcan.h>
 #include <cstdlib>
 #include <string>
+#include "pindef.h"
 
 typedef struct KLS_switches {
     bool hall_a;
