@@ -32,12 +32,12 @@ typedef struct KLS_errors {
 } KLS_errors;
 
 typedef struct KLS_status {
-    unsigned int rpm;
+    uint32_t rpm;
     float current;
     float voltage;
     float throttle;
-    unsigned int controller_temp;
-    unsigned int motor_temp;
+    uint32_t controller_temp;
+    uint32_t motor_temp;
     bool command_status;
     bool feedback_status;
     KLS_switches switches;
@@ -72,6 +72,53 @@ class KLS {
         status.switches.boost = 0;
 
         status.errors.count = 0;
+
+        // set analog resolution for all functions
+        analogWriteResolution(14);
+
+        // if the ID is odd, left motor
+        // if the ID is even, right motor
+        if (addr & 0x01) {
+            // set output PWM frequency for motor controller
+            analogWriteFrequency(PIN_MOTOR_L_THROTTLE, 32000);
+            analogWriteFrequency(PIN_MOTOR_L_REGEN, 32000);
+            // initialize GPIO for motor controller
+            pinMode(PIN_MOTOR_L_REGEN_EN, OUTPUT);
+            pinMode(PIN_MOTOR_L_REGEN, OUTPUT);
+            pinMode(PIN_MOTOR_L_THROTTLE, OUTPUT);
+            pinMode(PIN_MOTOR_L_ECO_EN, OUTPUT);
+            pinMode(PIN_MOTOR_L_METER, INPUT);
+            pinMode(PIN_MOTOR_L_FWD_EN, OUTPUT);
+            pinMode(PIN_MOTOR_L_REV_EN, OUTPUT);
+
+            digitalWrite(PIN_MOTOR_L_REGEN_EN, HIGH);
+            analogWrite(PIN_MOTOR_L_REGEN, 0);
+            analogWrite(PIN_MOTOR_L_THROTTLE, 0);
+            digitalWrite(PIN_MOTOR_L_ECO_EN, LOW);
+            // ??? = analogRead(PIN_MOTOR_L_METER);
+            pinMode(PIN_MOTOR_L_FWD_EN, HIGH);
+            pinMode(PIN_MOTOR_L_REV_EN, LOW);
+        } else {
+            // set output PWM frequency for motor controller
+            analogWriteFrequency(PIN_MOTOR_R_THROTTLE, 32000);
+            analogWriteFrequency(PIN_MOTOR_R_REGEN, 32000);
+            // initialize GPIO for motor controller
+            pinMode(PIN_MOTOR_R_REGEN_EN, OUTPUT);
+            pinMode(PIN_MOTOR_R_REGEN, OUTPUT);
+            pinMode(PIN_MOTOR_R_THROTTLE, OUTPUT);
+            pinMode(PIN_MOTOR_R_ECO_EN, OUTPUT);
+            pinMode(PIN_MOTOR_R_METER, INPUT);
+            pinMode(PIN_MOTOR_R_FWD_EN, OUTPUT);
+            pinMode(PIN_MOTOR_R_REV_EN, OUTPUT);
+
+            digitalWrite(PIN_MOTOR_R_REGEN_EN, HIGH);
+            analogWrite(PIN_MOTOR_R_REGEN, 0);
+            analogWrite(PIN_MOTOR_R_THROTTLE, 0);
+            digitalWrite(PIN_MOTOR_R_ECO_EN, LOW);
+            // ??? = analogRead(PIN_MOTOR_R_METER);
+            digitalWrite(PIN_MOTOR_R_FWD_EN, HIGH);
+            digitalWrite(PIN_MOTOR_R_REV_EN, LOW);
+        }
     };
 
     uint8_t parse(const CAN_message_t &msg) {
@@ -158,7 +205,7 @@ class KLS {
         status.switches.boost = new_status.switches.boost;
     }
 
-    void update(unsigned int rpm, float current, float voltage, float throttle) {
+    void update(uint32_t rpm, float current, float voltage, float throttle) {
         status.rpm = rpm;
         status.current = current;
         status.voltage = voltage;

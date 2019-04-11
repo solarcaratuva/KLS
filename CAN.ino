@@ -3,8 +3,11 @@
 FlexCAN Can1(250000, 1);
 // CAN struct to store received data
 static CAN_message_t msg_rx;
-// KLS motor controller class initialized with ID 0x05
-KLS kls(0x05);
+
+// Left motor initialized with ID 0x05
+KLS kls_l(0x05);
+// Right motor initialized with ID 0x06
+KLS kls_r(0x06);
 
 void setup() {
     Can1.begin();
@@ -14,9 +17,12 @@ void setup() {
 
 void loop() {
     if (Can1.available()) {
-        Can1.read(msg_rx);  // write data into msg
-        kls.parse(msg_rx);
-        kls.print();
+        Can1.read(msg_rx);
+        kls_l.parse(msg_rx);
+        kls_l.print();
+
+        kls_r.parse(msg_rx);
+        kls_r.print();
     }
     delay(60);
     // Commands to clear on a VT100 serial terminal
