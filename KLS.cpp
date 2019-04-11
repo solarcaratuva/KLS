@@ -33,7 +33,7 @@ KLS::KLS(uint8_t addr = 0x05) {
 
     // if the ID is odd, left motor
     // if the ID is even, right motor
-    if (addr & 0x01) {
+    if (id & 0x01) {
         // set output PWM frequency for motor controller
         analogWriteFrequency(PIN_MOTOR_L_THROTTLE, 32000);
         analogWriteFrequency(PIN_MOTOR_L_REGEN, 32000);
@@ -138,6 +138,16 @@ KLS_errors KLS::parse_errors(uint8_t lsb, uint8_t msb) {
         msb >>= 1;
     }
     return err;
+}
+
+void KLS::set_throttle(uint32_t value) {
+    // if the ID is odd, left motor
+    // if the ID is even, right motor
+    if (id & 0x01) {
+        analogWrite(PIN_MOTOR_L_THROTTLE, value);
+    } else {
+        analogWrite(PIN_MOTOR_R_THROTTLE, value);
+    }
 }
 
 void KLS::update(const KLS_status &new_status) {
