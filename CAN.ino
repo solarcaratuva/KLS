@@ -20,11 +20,14 @@ void loop() {
         Can1.read(msg_rx);
         kls_l.parse(msg_rx);
         kls_l.print();
-
         kls_r.parse(msg_rx);
         kls_r.print();
+        kls_l.set_throttle(32000);
+    } else {
+        kls_l.set_throttle(0);
     }
     delay(60);
+
     // Commands to clear on a VT100 serial terminal
     /*Serial.write(27);     // ESC command
     Serial.print("[2J");  // clear screen command
