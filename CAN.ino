@@ -16,7 +16,7 @@ void setup() {
 }
 
 void generate_sawtooth() {
-    for (int i = 0; i < 13652; i++) {
+    for (int i = 0; i < 12500; i++) {
         kls_l.set_throttle(i);
         kls_r.set_throttle(i);
     }

@@ -143,6 +143,9 @@ KLS_errors KLS::parse_errors(uint8_t lsb, uint8_t msb) {
 void KLS::set_throttle(uint32_t value) {
     // if the ID is odd, left motor
     // if the ID is even, right motor
+    if (value > MAX_PWM) {
+        value = MAX_PWM;
+    }
     if (id & 0x01) {
         analogWrite(PIN_MOTOR_L_THROTTLE, value);
     } else {

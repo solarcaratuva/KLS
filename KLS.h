@@ -8,6 +8,7 @@
 
 #ifndef __KLS_H__
 #define __KLS_H__
+#define MAX_PWM 12500
 
 #include <FlexCAN.h>
 #include <kinetis_flexcan.h>
