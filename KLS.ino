@@ -4,9 +4,9 @@ FlexCAN Can1(250000, 1);
 // CAN struct to store received data
 static CAN_message_t msg_rx;
 
-// Left motor initialized with ID 0x05
+// Left motor initialized with source address 0x05
 KLS kls_l(0x05);
-// Right motor initialized with ID 0x06
+// Right motor initialized with source address 0x06
 KLS kls_r(0x06);
 
 void setup() {
