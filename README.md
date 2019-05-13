@@ -1,5 +1,5 @@
-# CAN
-Code for interfacing over CAN using Teensy 3.6 for the UVA Solar Car project.
+# KLS
+Code for interfacing with KLS motor controllers using Teensy 3.6 for the UVA Solar Car project.
 
 ## Contents of this repository
 * "kls.h" contains the class definition for KLS
