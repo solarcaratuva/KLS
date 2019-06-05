@@ -1,9 +1,4 @@
 #include "KLS.h"
-#include <FlexCAN.h>
-#include <kinetis_flexcan.h>
-#include <cstdlib>
-#include <string>
-#include "pindef.h"
 
 KLS::KLS(uint8_t addr = 0x05) {
     id = addr;
@@ -151,6 +146,53 @@ void KLS::set_throttle(uint32_t value) {
     } else {
         analogWrite(PIN_MOTOR_R_THROTTLE, value);
     }
+}
+
+
+// untested
+void KLS::regen_en(bool value){
+    const uint32_t regen_en_pin = (id & 0x01) ? PIN_MOTOR_L_REGEN_EN : PIN_MOTOR_R_REGEN_EN;
+    digitalWrite(regen_en_pin, value);
+}
+
+// untested
+void KLS::set_regen(uint32_t value) {
+    // if the ID is odd, left motor
+    // if the ID is even, right motor
+    if (value > MAX_PWM) {
+        value = MAX_PWM;
+    }
+    if (id & 0x01) {
+        analogWrite(PIN_MOTOR_L_REGEN, value);
+    } else {
+        analogWrite(PIN_MOTOR_R_REGEN, value);
+    }
+}
+
+//untested
+void KLS::set_direction(uint8_t value) {
+
+    const uint32_t fwd_en_pin = (id & 0x01) ? PIN_MOTOR_L_FWD_EN : PIN_MOTOR_R_FWD_EN;
+    const uint32_t rev_en_pin = (id & 0x01) ? PIN_MOTOR_L_REV_EN : PIN_MOTOR_R_REV_EN;
+    
+    if(value > 0){
+      digitalWrite(fwd_en_pin, HIGH);
+      digitalWrite(rev_en_pin, LOW);
+    }
+    else if(value < 0){
+      digitalWrite(fwd_en_pin, LOW);
+      digitalWrite(rev_en_pin, HIGH);
+    }
+    else{
+      digitalWrite(fwd_en_pin, LOW);
+      digitalWrite(rev_en_pin, LOW);
+    }
+}
+
+// untested
+void KLS::eco_en(boolean value){
+  digitalWrite(PIN_MOTOR_R_ECO_EN, value);
+  digitalWrite(PIN_MOTOR_L_ECO_EN, value);
 }
 
 void KLS::update(const KLS_status &new_status) {
