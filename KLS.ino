@@ -6,9 +6,9 @@ FlexCAN Can1(250000, 1);
 static CAN_message_t msg_rx_0;
 static CAN_message_t msg_rx_1;
 
-// Left motor initialized with ID 0x05
+// Left motor initialized with source address 0x05
 KLS kls_l(0x05);
-// Right motor initialized with ID 0x06
+// Right motor initialized with source address 0x06
 KLS kls_r(0x06);
 
 void setup() {
