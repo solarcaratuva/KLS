@@ -27,19 +27,20 @@ void generate_sawtooth() {
 
 void loop() {
     uint32_t throttle = map(analogRead(PIN_THROTTLE_CTRL), 0, 1023, 0, MAX_PWM);
+    // Serial.println(throttle);
     kls_l.set_throttle(throttle);
     kls_r.set_throttle(throttle);
     if (Can1.available()) {
         Can1.read(msg_rx);
-        // Serial.printf("Can1: %08x\n", msg_rx_1.id);
+        // Serial.printf("Can1: %08x\n", msg_rx.id);
         kls_l.parse(msg_rx);
-        Serial.printf("Left Motor:\n");
+        // Serial.printf("Left Motor:\n");
         kls_l.print();
-        Serial.printf("Right Motor:\n");
+        // Serial.printf("Right Motor:\n");
         kls_r.parse(msg_rx);
         kls_r.print();
     }
-    delay(150);
+    delay(120);
     // Commands to clear on a VT100 serial terminal
     /*Serial.write(27);     // ESC command
     Serial.print("[2J");  // clear screen command

@@ -79,7 +79,7 @@ uint8_t KLS::parse(const CAN_message_t &msg) {
         // rpm values range from 0-6000RPM
         status.rpm = (msg.buf[1] << 8) + msg.buf[0];
         // current values range from 0-400A
-        status.current = (msg.buf[3] << 8) + msg.buf[2];
+        status.current = ((msg.buf[3] << 8) + msg.buf[2]) / 10.0;
         // voltage values range from 0-180V
         status.voltage = ((msg.buf[5] << 8) + msg.buf[4]) / 10.0;
         status.errors = parse_errors(msg.buf[6], msg.buf[7]);
@@ -89,7 +89,6 @@ uint8_t KLS::parse(const CAN_message_t &msg) {
         parsed = 2;
         // throttle will only go from 0.8-4.2V
         // throttle values map from 0-255 to 0-5V
-        Serial.println(msg.buf[0]);
         status.throttle = (msg.buf[0] * 5.0) / 255.0;
         // temperature offset of 40C
         status.controller_temp = msg.buf[1] - 40;
