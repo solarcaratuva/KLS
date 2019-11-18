@@ -26,7 +26,28 @@ void generate_sawtooth() {
 }
 
 void loop() {
-    uint32_t throttle = map(analogRead(PIN_THROTTLE_CTRL), 0, 1023, 0, MAX_PWM);
+    // Set both motors to go forward
+    kls_l.set_direction(1);
+    kls_r.set_direction(1);
+    uint32_t throttle = analogRead(PIN_THROTTLE_CTRL);
+    Serial.println(throttle);
+    if (throttle < 300) {
+        kls_l.regen_en(true);
+        kls_r.regen_en(true);
+        uint32_t regen = 660 - throttle;
+        regen = map(regen, 200, 660, 0, MAX_PWM);
+        Serial.print("regen: ");
+        Serial.println(regen);
+        kls_l.set_regen(regen);
+        kls_r.set_regen(regen);
+    } else {
+        kls_l.regen_en(false);
+        kls_r.regen_en(false);
+        kls_l.set_regen(0);
+        kls_r.set_regen(0);
+        // throttle = map(throttle, 200, 660, 0, MAX_PWM);
+    }
+    throttle = map(throttle, 200, 660, 0, MAX_PWM);
     // Serial.println(throttle);
     kls_l.set_throttle(throttle);
     kls_r.set_throttle(throttle);
@@ -34,9 +55,9 @@ void loop() {
         Can1.read(msg_rx);
         // Serial.printf("Can1: %08x\n", msg_rx.id);
         kls_l.parse(msg_rx);
-        // Serial.printf("Left Motor:\n");
+        Serial.printf("Left Motor:\n");
         kls_l.print();
-        // Serial.printf("Right Motor:\n");
+        Serial.printf("Right Motor:\n");
         kls_r.parse(msg_rx);
         kls_r.print();
     }
