@@ -63,7 +63,7 @@ class KLS {
 
     void set_regen(uint32_t value);  // untested
 
-    void set_direction(uint8_t value);  // untested
+    void set_direction(int8_t value);  // untested
 
     static void eco_en(boolean value);  // untested
 

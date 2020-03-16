@@ -169,7 +169,7 @@ void KLS::set_regen(uint32_t value) {
 }
 
 // untested
-void KLS::set_direction(uint8_t value) {
+void KLS::set_direction(int8_t value) {
     const uint32_t fwd_en_pin = (id & 0x01) ? PIN_MOTOR_L_FWD_EN : PIN_MOTOR_R_FWD_EN;
     const uint32_t rev_en_pin = (id & 0x01) ? PIN_MOTOR_L_REV_EN : PIN_MOTOR_R_REV_EN;
 
