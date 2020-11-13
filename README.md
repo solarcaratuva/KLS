@@ -2,14 +2,15 @@
 Code for interfacing with KLS motor controllers using Teensy 3.6 for the UVA Solar Car project.
 
 ## Contents of this repository
-* "kls.h" contains the class definition for KLS
+* `KLS.h` contains the class definition for KLS
+* `KLS.ino` contains an example Arduino program for using the library functions
 * **WIP**
 
 
 ## KLS Motor Controller Library
 * Written to interface with [Kelly Controls KLS 8080I family of motor controllers](https://kellyev.com/shop/kls-8080i-ips/) over CAN
 * Tested with KLS 12201-8080I 
-* Class written based on [manufactuer specifications for the motor controller's CAN protocol](https://kellyev.com/wp-content/uploads/kls-8080i-ips/Sinusoidal-Wave-Controller-KLS-D-8080I-8080IPS-Broadcast-CAN-Protocol.pdf)
+* Class written based on [manufacturer specifications for the motor controller's CAN protocol](https://kellyev.com/wp-content/uploads/kls-8080i-ips/Sinusoidal-Wave-Controller-KLS-D-8080I-8080IPS-Broadcast-CAN-Protocol.pdf)
 * Requires the [fork of the FlexCAN library by pawelsky](https://github.com/pawelsky/FlexCAN_Library)
 * **WIP** Library documentation
 
